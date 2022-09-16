@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "rn-cognito",
+    "slug": "rn-cognito",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
