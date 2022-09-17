@@ -1,7 +1,8 @@
 import {
   Text,
   View,
-  StyleSheet
+  StyleSheet,
+  Button
 } from 'react-native';
 
 const GoogleLogin = () => {
@@ -9,6 +10,10 @@ const GoogleLogin = () => {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Google Auth</Text>
+        <Button
+          title='Logar com google'
+          onPress={ () => alert('Okay')}
+        />
       </View>
     </View>
   )
@@ -25,7 +30,9 @@ const styles = StyleSheet.create({
     width: '80%',
     height: '80%',
     backgroundColor: '#fff',
-    borderRadius: 22
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   title: {
     fontSize: 22,

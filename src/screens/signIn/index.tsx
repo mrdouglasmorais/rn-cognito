@@ -34,6 +34,7 @@ const SignIn = () => {
         >
           Logar
         </Text>
+        <Text>Informe seu email</Text>
         <TextInput
           style={styles.inputText}
           placeholder='Informe seu email'
@@ -41,6 +42,7 @@ const SignIn = () => {
           value={userData.email}
           keyboardType='email-address'
         />
+        <Text>Informe sua senha</Text>
         <TextInput
           style={styles.inputText}
           placeholder='Informe sua senha'
