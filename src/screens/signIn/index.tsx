@@ -10,16 +10,31 @@ import {
 
 import { useState } from 'react'
 
+import { Auth } from 'aws-amplify'
+
 interface IUserData{
-  email: string;
+  username: string;
   password: string;
 }
 
 const SignIn = () => {
   const [ userData, setUserData ] = useState<IUserData>({
-    email: '',
+    username: '',
     password: ''
   });
+
+  async function signIn({ username, password }: IUserData) {
+    try {
+      const user = await Auth.signIn(
+        username,
+        password
+      )
+      console.log('Aeee Logou', user)
+      return user
+    } catch (error) {
+      console.error('Erro ao logar', error)
+    }
+  }
 
   return(
     <KeyboardAvoidingView
@@ -34,12 +49,12 @@ const SignIn = () => {
         >
           Logar
         </Text>
-        <Text>Informe seu email</Text>
+        <Text>Informe seu nome de usuário</Text>
         <TextInput
           style={styles.inputText}
           placeholder='Informe seu email'
-          onChangeText={ text => setUserData({ ...userData, email: text })}
-          value={userData.email}
+          onChangeText={ text => setUserData({ ...userData, username: text })}
+          value={userData.username}
           keyboardType='email-address'
         />
         <Text>Informe sua senha</Text>
@@ -52,7 +67,7 @@ const SignIn = () => {
         />
         <Button
           title='Entrar'
-          onPress={ () => alert('okay')}
+          onPress={ () => signIn(userData)}
         />
       </View>
     </KeyboardAvoidingView>

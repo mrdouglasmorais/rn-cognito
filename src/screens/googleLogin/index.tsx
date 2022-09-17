@@ -2,17 +2,66 @@ import {
   Text,
   View,
   StyleSheet,
-  Button
+  Button,
+  Linking
 } from 'react-native';
 
+import {
+  Auth,
+  Hub,
+  Amplify
+} from 'aws-amplify';
+
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+
+import awsmobile from '../../aws-exports';
+import { useEffect, useState } from 'react';
+
+async function urlOpener(url: any, redirectURL: any){
+  await InAppBrowser.isAvailable;
+
+  const all = await InAppBrowser.openAuth(url, redirectURL, {
+    showTitle: false,
+    enableUrlBarHiding: true,
+    enableDefaultShare: false,
+    ephemeralWebSession: false
+  })
+
+  console.log('todos os dados', all)
+  if (all.type === 'success'){
+    Linking.openURL(redirectURL)
+  }
+}
+
+Amplify.configure({
+  ...awsmobile,
+  oauth: {
+    ...awsmobile.oauth,
+    urlOpener
+  }
+})
+
 const GoogleLogin = () => {
+
+  const [ user, setUser ] = useState<any>();
+
+  useEffect(() => {
+
+  }, [])
+
+  function getUser(){
+    return Auth.currentAutenticatedUser()
+      .then((userData: any) => userData)
+      .catch(() => console.log('erro ao logar'))
+  }
+
   return(
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Google Auth</Text>
         <Button
           title='Logar com google'
-          onPress={ () => alert('Okay')}
+          onPress={ () => Auth.federatedSignIn()}
         />
       </View>
     </View>

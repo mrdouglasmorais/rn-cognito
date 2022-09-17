@@ -8,100 +8,160 @@ import {
   Platform
 } from 'react-native';
 
-import { useState } from 'react'
+import { Auth } from 'aws-amplify';
+
+import { useState } from 'react';
 
 interface IRegisterData{
   username: string;
-  email: string;
   password: string;
-  phone: string
-  confirmationCode?: string;
+  email: string;
+  phone_number: string
+  code?: string;
 }
 
 const SignUp = () => {
   const [ userData, setUserData ] = useState<IRegisterData>({
     username: '',
-    email: '',
     password: '',
-    phone: ''
+    email: '',
+    phone_number: ''
   });
   const [ isConfirmCode, setIsConfirmCode ] = useState(false);
+  const [ isLoad, setIsload ] = useState(false)
+
+  async function signUp(userData: IRegisterData){
+    const { username, email, password, phone_number} = userData;
+    setIsload(!isLoad)
+    try {
+      const { user } = await Auth.signUp({
+          username,
+          password,
+          attributes: {
+            email,
+            phone_number
+          },
+          autoSignIn: {
+            enabled: true
+          }
+      })
+      setIsConfirmCode(!isConfirmCode)    
+    } catch (error) {
+      console.error('Falha no cadastro', error)
+    } finally {
+      setIsload(false)
+      console.log('encerrado')
+    }
+  }
+
+  async function confirmSignUp(userData: IRegisterData){
+    setIsload(!isLoad)
+    const { username, code } = userData
+    try {
+      Auth.confirmSignUp(username, code)
+      console.log('Confirmado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao confirmar', error)
+    } finally {
+      setIsload(false)
+      console.log('encerrado')
+    }
+  }
 
   return(
     <KeyboardAvoidingView
       behavior={ Platform.OS === 'ios' ? 'padding': 'position' }
       style={styles.container}
     >
-      { !isConfirmCode ? (
+    <>
+      { isLoad ? (
+        <View
+        style={styles.container}
+        >
           <View
-          style={styles.formContent}
+            style={styles.formContent}
           >
-          <Text
-            style={styles.textTitle}
-          >
-            Cadastrar
-          </Text>
-          <Text>Informe seu nome de usuário</Text>
-          <TextInput
-            style={styles.inputText}
-            placeholder='Informe seu nome de usuário'
-            onChangeText={ text => setUserData({ ...userData, username: text })}
-            value={userData.username}
-            keyboardType='email-address'
-          />
-          <Text>Informe seu email</Text>
-          <TextInput
-            style={styles.inputText}
-            placeholder='Informe seu email'
-            onChangeText={ text => setUserData({ ...userData, email: text })}
-            value={userData.email}
-            keyboardType='email-address'
-          />
-          <Text>Informe sua senha</Text>
-          <TextInput
-            style={styles.inputText}
-            placeholder='Informe sua senha'
-            onChangeText={ text => setUserData({ ...userData, password: text })}
-            value={userData.password}
-            secureTextEntry={true}
-          />
-          <Text>Informe seu telefone</Text>
-          <TextInput
-            style={styles.inputText}
-            placeholder='Informe seu telefone'
-            onChangeText={ text => setUserData({ ...userData, phone: text })}
-            value={userData.phone}
-            keyboardType='numeric'
-          />
-          <Button
-            title='Cadastrar'
-            onPress={ () => setIsConfirmCode(!isConfirmCode)}
-          />
+            <Text
+              style={styles.textTitle}
+            >
+            Aguarde Carregando...
+            </Text>
+          </View>
         </View>
       ) : (
-        <View
-          style={styles.formContent}
-          >
-          <Text
-            style={styles.textTitle}
-          >
-            Confirmar código
-          </Text>
-          <Text>Informe seu código</Text>
-          <TextInput
-            style={styles.inputText}
-            placeholder='Informe seu código'
-            onChangeText={ text => setUserData({ ...userData, confirmationCode: text })}
-            value={userData.confirmationCode}
-            keyboardType='numeric'
-          />
-          <Button
-            title='Confirmar'
-            onPress={ () => setIsConfirmCode(!isConfirmCode)}
-          />
-        </View>
+        <>
+          { !isConfirmCode ? (
+              <View
+              style={styles.formContent}
+              >
+              <Text
+                style={styles.textTitle}
+              >
+                Cadastrar
+              </Text>
+              <Text>Informe seu nome de usuário</Text>
+              <TextInput
+                style={styles.inputText}
+                placeholder='Informe seu nome de usuário'
+                onChangeText={ text => setUserData({ ...userData, username: text.toLowerCase() })}
+                value={userData.username}
+                keyboardType='email-address'
+              />
+              <Text>Informe seu email</Text>
+              <TextInput
+                style={styles.inputText}
+                placeholder='Informe seu email'
+                onChangeText={ text => setUserData({ ...userData, email: text.toLowerCase() })}
+                value={userData.email}
+                keyboardType='email-address'
+              />
+              <Text>Informe sua senha</Text>
+              <TextInput
+                style={styles.inputText}
+                placeholder='Informe sua senha'
+                onChangeText={ text => setUserData({ ...userData, password: text.toLowerCase() })}
+                value={userData.password}
+                secureTextEntry={true}
+              />
+              <Text>Informe seu telefone</Text>
+              <TextInput
+                style={styles.inputText}
+                placeholder='Informe seu telefone'
+                onChangeText={ text => setUserData({ ...userData, phone_number: text.toLowerCase() })}
+                value={userData.phone_number}
+                keyboardType='numeric'
+              />
+              <Button
+                title='Cadastrar'
+                onPress={ () => signUp(userData)}
+              />
+            </View>
+          ) : (
+            <View
+              style={styles.formContent}
+              >
+              <Text
+                style={styles.textTitle}
+              >
+                Confirmar código
+              </Text>
+              <Text>Informe seu código</Text>
+              <TextInput
+                style={styles.inputText}
+                placeholder='Informe seu código'
+                onChangeText={ text => setUserData({ ...userData, code: text })}
+                value={userData.code}
+                keyboardType='numeric'
+              />
+              <Button
+                title='Confirmar'
+                onPress={ () => confirmSignUp(userData)}
+              />
+            </View>
+          )}
+        </>
       )}
-      
+    </>  
     </KeyboardAvoidingView>
   )
 }
