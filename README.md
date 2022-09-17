@@ -2,7 +2,7 @@
 
 ## 1 - Conta ativa na AWS.
 
-## 2 - Instalar AWS Amplyfy
+## 2 - Instalar AWS Amplify
 `npm install -g @aws-amplify/cli`
 
 ## 3 - Configurar credenciais (dentro do diretório do projeto);
