@@ -8,28 +8,48 @@ import {
 import {
   useNavigation,
 } from '@react-navigation/native'
+import { useState } from 'react';
 
 
 const Home = () => {
   const { navigate } = useNavigation();
+  const [state, setState ] = useState<string>();
 
   const handleScreen = (name: string) => {
     navigate(name)
   }
   return(
     <View style={styles.container}>
-      <Text style={styles.text}>Home</Text>
+      <Text
+        testID='testState'
+      >
+        { state ?? state }
+      </Text>
+      <Text
+      style={styles.text}
+      testID="homeText"
+      >
+        Home
+      </Text>
       <Button
         title='SignIn'
+        testID='signIn'
         onPress={ () => handleScreen('SignIn')}
       />
       <Button
         title='SignUp'
+        testID='signUp'
         onPress={ () => handleScreen('SignUp')}
       />
       <Button
         title='Google Login'
+        testID='googleLogin'
         onPress={ () => handleScreen('GoogleLogin')}
+      />
+      <Button
+        title='Tester'
+        testID='testButton'
+        onPress={ () => setState('funcionou!')}
       />
     </View>
   )
