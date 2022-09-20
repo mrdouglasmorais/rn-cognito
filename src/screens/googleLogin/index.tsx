@@ -66,14 +66,13 @@ const GoogleLogin = () => {
           </>
         ) : (
           <>
-            <Text>Usuário não logado</Text>
+            <Text style={styles.title}>Google Auth</Text>
+            <Button
+              title='Logar com google'
+              onPress={signIn}
+            />
           </>
         )}
-        <Text style={styles.title}>Google Auth</Text>
-        <Button
-          title='Logar com google'
-          onPress={signIn}
-        />
       </View>
     </View>
   )
