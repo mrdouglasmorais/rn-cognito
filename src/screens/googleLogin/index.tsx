@@ -3,65 +3,76 @@ import {
   View,
   StyleSheet,
   Button,
-  Linking
 } from 'react-native';
 
 import {
   Auth,
-  Hub,
-  Amplify
+  Hub
 } from 'aws-amplify';
 
-import InAppBrowser from 'react-native-inappbrowser-reborn';
+import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth'
 
-import awsmobile from '../../aws-exports';
-import { useEffect, useState } from 'react';
-
-async function urlOpener(url: any, redirectURL: any){
-  await InAppBrowser.isAvailable;
-
-  const all = await InAppBrowser.openAuth(url, redirectURL, {
-    showTitle: false,
-    enableUrlBarHiding: true,
-    enableDefaultShare: false,
-    ephemeralWebSession: false
-  })
-
-  console.log('todos os dados', all)
-  if (all.type === 'success'){
-    Linking.openURL(redirectURL)
-  }
-}
-
-Amplify.configure({
-  ...awsmobile,
-  oauth: {
-    ...awsmobile.oauth,
-    urlOpener
-  }
-})
+import { useCallback, useEffect, useState } from 'react';
 
 const GoogleLogin = () => {
 
   const [ user, setUser ] = useState<any>();
 
   useEffect(() => {
+    const unsubcribe = Hub.listen('auth', ({payload: { event, data }}: any) => {
+      switch (event) {
+        case 'signIn':
+          setUser(data);
+          break;
 
-  }, [])
+        case  'signOut':
+          setUser(null)
+          break;
+      
+        case 'signIn_failure':
+        case 'cognitoHostedUi_failure':
+          console.log('Erro ao logar' ,data)
+      }
+    });
 
-  function getUser(){
-    return Auth.currentAutenticatedUser()
-      .then((userData: any) => userData)
-      .catch(() => console.log('erro ao logar'))
+    Auth.currentAuthenticatedUser()
+      .then( (currentUser: any) => setUser(currentUser))
+      .catch( () => console.log('Erro ao logar'));
+
+    return unsubcribe
+  }, []);
+
+  async function sigOut(){
+    try {
+      await Auth.signOut({ global: true})
+    } catch (error) {
+      console.error('Falha', error);
+    }
   }
+
+  const signIn = useCallback(() => {
+    Auth.federatedSignIn({provider: CognitoHostedUIIdentityProvider.Google})
+  }, [])
 
   return(
     <View style={styles.container}>
       <View style={styles.content}>
+        {user ? (
+          <>
+            <Button
+              title='Sair da sessão'
+              onPress={ () => sigOut()}
+            />
+          </>
+        ) : (
+          <>
+            <Text>Usuário não logado</Text>
+          </>
+        )}
         <Text style={styles.title}>Google Auth</Text>
         <Button
           title='Logar com google'
-          onPress={ () => Auth.federatedSignIn()}
+          onPress={signIn}
         />
       </View>
     </View>

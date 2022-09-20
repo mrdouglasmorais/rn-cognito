@@ -21,3 +21,5 @@
 ## 7 - Publicar
 `amplify push`
 
+# Para implementar o social login usando uma conta google acesse o seguinte link [clique aqui](https://console.cloud.google.com/apis/credentials?);
+

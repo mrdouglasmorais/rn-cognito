@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "rn-cognito",
-    "slug": "rn-cognito",
+    "name": "rncognito",
+    "slug": "rncognito",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
