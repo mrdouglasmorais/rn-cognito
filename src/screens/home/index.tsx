@@ -9,6 +9,7 @@ import {
   useNavigation,
 } from '@react-navigation/native'
 import { useState } from 'react';
+import React from 'react';
 
 
 const Home = () => {
